@@ -1,0 +1,59 @@
+cff-version: 1.2.0
+message: "If you reference this book, please cite it as below."
+type: book
+title: "macOS Security Research: A Complete Framework"
+abstract: >-
+  A complete six-phase methodology for macOS vulnerability research,
+  distilled from 35 years of practice. Covers Scope, Recon, Research
+  Tracks, Red-Team, Submission, and Archive phases. Includes the
+  BSD-to-XNU CVE cross-reference technique, the discipline of evidence
+  capture, and the human side of vendor coordination under the 90-day
+  responsible disclosure standard.
+authors:
+  - given-names: Stuart Paul
+    family-names: Thomas
+    orcid: "https://orcid.org/0009-0008-4518-0064"
+    affiliation: "Independent Researcher, Whitby, North Yorkshire, UK"
+    email: stuartpaulthomas@gmail.com
+    website: "https://stuart-thomas.com"
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.19855016
+    description: Permanent DOI on Zenodo
+  - type: url
+    value: "https://stuart-thomas.com/book/macos-security-research/"
+    description: Canonical site
+url: "https://stuart-thomas.com/book/macos-security-research/"
+repository-code: "https://github.com/jetnoir/macos-security-research-book"
+license: CC-BY-SA-4.0
+version: 1.0.0
+date-released: "2026-04-28"
+keywords:
+  - macOS
+  - security research
+  - vulnerability research
+  - Darwin
+  - XNU
+  - BSD
+  - methodology
+  - responsible disclosure
+  - kernel security
+  - MACF
+  - SIP
+  - ICMP
+  - PING
+  - English law
+preferred-citation:
+  type: book
+  title: "macOS Security Research: A Complete Framework"
+  authors:
+    - given-names: Stuart Paul
+      family-names: Thomas
+      orcid: "https://orcid.org/0009-0008-4518-0064"
+  year: 2026
+  month: 4
+  publisher:
+    name: Zenodo
+  doi: 10.5281/zenodo.19855016
+  url: "https://doi.org/10.5281/zenodo.19855016"
+  version: 1.0.0

@@ -2,7 +2,7 @@
 
 > A complete six-phase methodology for macOS vulnerability research — from PING as the metaphor for asking systems questions through to coordinated disclosure with vendors.
 >
-> **By [Stuart Paul Thomas](https://stuart-thomas.com).** First Edition · April 2026 · English Law (England & Wales).
+> **By [Stuart Paul Thomas](https://stuart-thomas.com).** [![ORCID](https://img.shields.io/badge/ORCID-0009--0008--4518--0064-A6CE39?logo=orcid&logoColor=white)](https://orcid.org/0009-0008-4518-0064) First Edition · April 2026 · English Law (England & Wales).
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19855016.svg)](https://doi.org/10.5281/zenodo.19855016)
 [![License: CC BY-SA 4.0](https://img.shields.io/badge/License-CC%20BY--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-sa/4.0/)
@@ -129,6 +129,7 @@ The book is archived on [Zenodo](https://zenodo.org/records/19855016) with a per
 ```bibtex
 @book{thomas_2026_macos_security_research,
   author       = {Thomas, Stuart Paul},
+  orcid        = {0009-0008-4518-0064},
   title        = {{macOS Security Research: A Complete Framework}},
   edition      = {First Edition},
   year         = {2026},
