@@ -4,6 +4,7 @@
 >
 > **By [Stuart Paul Thomas](https://stuart-thomas.com).** First Edition · April 2026 · English Law (England & Wales).
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19855016.svg)](https://doi.org/10.5281/zenodo.19855016)
 [![License: CC BY-SA 4.0](https://img.shields.io/badge/License-CC%20BY--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-sa/4.0/)
 [![Free download](https://img.shields.io/badge/Free-Download-brightgreen.svg)](https://stuart-thomas.com/book/macos-security-research/)
 [![Read TL;DR](https://img.shields.io/badge/Read-5%20min%20TL%3BDR-blue.svg)](https://stuart-thomas.com/macos-security-framework.html)
@@ -112,6 +113,36 @@ Other work:
 - **Security research papers:** <https://github.com/jetnoir/security-research> — including the [TriageForge spectral binary screening paper](https://github.com/jetnoir/security-research/blob/main/triageforge-2026.md), [SQL Injection 2026 edition](https://github.com/jetnoir/security-research/blob/main/sql-injection-2026.md), and [ICMP Crafting 2026 edition](https://github.com/jetnoir/security-research/blob/main/icmp-tunneling-2026.md)
 - **Whitby Jet provenance platform:** <https://authenticwhitbyjet.co.uk>
 - **NTAG 424 DNA SDK for macOS:** <https://github.com/jetnoir/ntag424-macos>
+
+---
+
+## How to cite
+
+The book is archived on [Zenodo](https://zenodo.org/records/19855016) with a permanent DOI: **[10.5281/zenodo.19855016](https://doi.org/10.5281/zenodo.19855016)**.
+
+### APA
+
+> Thomas, S. P. (2026). *macOS Security Research: A Complete Framework* (Version 1.0.0) [Book]. Zenodo. https://doi.org/10.5281/zenodo.19855016
+
+### BibTeX
+
+```bibtex
+@book{thomas_2026_macos_security_research,
+  author       = {Thomas, Stuart Paul},
+  title        = {{macOS Security Research: A Complete Framework}},
+  edition      = {First Edition},
+  year         = {2026},
+  month        = apr,
+  publisher    = {Zenodo},
+  version      = {1.0.0},
+  doi          = {10.5281/zenodo.19855016},
+  url          = {https://doi.org/10.5281/zenodo.19855016}
+}
+```
+
+### Plain text
+
+> Stuart Paul Thomas. (2026). *macOS Security Research: A Complete Framework* (First Edition). DOI: 10.5281/zenodo.19855016.
 
 ---
 
