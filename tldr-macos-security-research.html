@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>macOS Security Research: A Complete Framework — Free Summary | Stuart Paul Thomas</title>
+    <meta name="description" content="A free summary of the six-phase macOS security research framework by Stuart Paul Thomas. From PING to responsible disclosure — the essential methodology in one page.">
+    <meta name="author" content="Stuart Paul Thomas">
+    <meta property="og:title" content="macOS Security Research: Free TL;DR Summary">
+    <meta property="og:description" content="35 years of security research methodology distilled into six phases. Free summary by Stuart Paul Thomas.">
+    <meta property="og:type" content="article">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* ── RESET ── */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; font-size: 16px; }
+
+        /* ── PALETTE — matching stuart-thomas.com ── */
+        :root {
+            --bg:           #050508;
+            --bg-surface:   #0d0d14;
+            --bg-card:      #111118;
+            --bg-card-hover:#16161f;
+            --border:       rgba(106,108,242,0.15);
+            --border-soft:  rgba(255,255,255,0.06);
+            --indigo:       #6a6cf2;
+            --indigo-dim:   rgba(106,108,242,0.12);
+            --indigo-glow:  rgba(106,108,242,0.25);
+            --text:         #e8e8f0;
+            --text-muted:   #8888a8;
+            --text-faint:   #55556a;
+            --white:        #ffffff;
+            --amber:        #f5a623;
+            --red:          #e05555;
+            --green:        #4ade80;
+        }
+
+        /* ── BODY ── */
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            line-height: 1.75;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── STICKY NAV ── */
+        .site-nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(5,5,8,0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-soft);
+            padding: 0 24px;
+        }
+        .site-nav .nav-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            height: 52px;
+        }
+        .site-nav .nav-brand {
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .site-nav .nav-brand span { color: var(--indigo); }
+        .site-nav .nav-links {
+            display: flex;
+            gap: 4px;
+        }
+        .site-nav .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.72rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            padding: 6px 10px;
+            border-radius: 4px;
+            transition: color 0.2s, background 0.2s;
+        }
+        .site-nav .nav-links a:hover { color: var(--white); background: rgba(255,255,255,0.05); }
+
+        /* ── HERO ── */
+        .hero {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 80px 24px 60px;
+            text-align: center;
+        }
+        .hero-badge {
+            display: inline-block;
+            background: var(--indigo-dim);
+            border: 1px solid var(--border);
+            color: var(--indigo);
+            font-size: 0.72rem;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 5px 14px;
+            border-radius: 100px;
+            margin-bottom: 28px;
+        }
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            color: var(--white);
+            margin-bottom: 20px;
+        }
+        .hero h1 .accent { color: var(--indigo); }
+        .hero .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 580px;
+            margin: 0 auto 40px;
+            line-height: 1.65;
+        }
+        .hero-meta {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            font-size: 0.78rem;
+            color: var(--text-faint);
+        }
+        .hero-meta span { display: flex; align-items: center; gap: 6px; }
+
+        /* ── CONTENT WRAPPER ── */
+        .content {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 0 24px 80px;
+        }
+
+        /* ── NOTICE BOXES ── */
+        .notice {
+            border-radius: 8px;
+            padding: 18px 22px;
+            margin: 32px 0;
+            font-size: 0.88rem;
+            line-height: 1.65;
+        }
+        .notice-copyright {
+            background: var(--indigo-dim);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+        .notice-copyright strong { color: var(--text); }
+        .notice-legal {
+            background: rgba(245,166,35,0.07);
+            border: 1px solid rgba(245,166,35,0.2);
+            color: #c49020;
+        }
+        .notice-legal strong { color: var(--amber); }
+        .notice-cma {
+            background: rgba(224,85,85,0.07);
+            border: 1px solid rgba(224,85,85,0.2);
+            color: #c04040;
+        }
+        .notice-cma strong { color: var(--red); }
+        .notice-title {
+            display: block;
+            font-weight: 600;
+            font-size: 0.72rem;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            opacity: 0.8;
+        }
+
+        /* ── SECTION HEADINGS ── */
+        .section-label {
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--indigo);
+            margin-bottom: 12px;
+        }
+        h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--white);
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+        h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--white);
+            margin: 28px 0 10px;
+        }
+        p {
+            color: var(--text-muted);
+            margin-bottom: 18px;
+            font-size: 0.97rem;
+        }
+        p strong { color: var(--text); }
+
+        /* ── DIVIDER ── */
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border-soft);
+            margin: 48px 0;
+        }
+
+        /* ── PHASE GRID ── */
+        .phases-intro {
+            margin: 40px 0 32px;
+        }
+        .phase-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin: 0 0 40px;
+        }
+        .phase-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-soft);
+            border-radius: 10px;
+            padding: 20px;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .phase-card:hover {
+            border-color: var(--border);
+            background: var(--bg-card-hover);
+        }
+        .phase-number {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem;
+            color: var(--indigo);
+            letter-spacing: 0.06em;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .phase-name {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 8px;
+        }
+        .phase-desc {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* ── PRINCIPLE CARDS ── */
+        .principle-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin: 28px 0;
+        }
+        .principle-item {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            background: var(--bg-card);
+            border: 1px solid var(--border-soft);
+            border-radius: 8px;
+            padding: 16px 20px;
+        }
+        .principle-icon {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            color: var(--indigo);
+            background: var(--indigo-dim);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 3px 7px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .principle-text {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+        .principle-text strong { color: var(--text); }
+
+        /* ── BLOCKQUOTE ── */
+        blockquote {
+            border-left: 3px solid var(--indigo);
+            margin: 28px 0;
+            padding: 16px 24px;
+            background: var(--indigo-dim);
+            border-radius: 0 8px 8px 0;
+        }
+        blockquote p {
+            font-size: 1rem;
+            font-style: italic;
+            color: var(--text);
+            margin: 0;
+        }
+        blockquote cite {
+            display: block;
+            font-size: 0.8rem;
+            font-style: normal;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        /* ── CODE INLINE ── */
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85em;
+            background: var(--indigo-dim);
+            color: var(--indigo);
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        /* ── DOWNLOAD CTA ── */
+        .cta-section {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-soft);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            margin: 48px 0;
+        }
+        .cta-section h2 { font-size: 1.5rem; margin-bottom: 12px; }
+        .cta-section p { max-width: 520px; margin: 0 auto 28px; }
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn-download {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 0.88rem;
+            padding: 11px 22px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: opacity 0.2s, transform 0.1s, border-color 0.2s;
+            letter-spacing: 0.01em;
+            border: 1px solid var(--border-soft);
+        }
+        .btn-download:hover { opacity: 0.85; transform: translateY(-1px); }
+        .btn-pdf  { background: var(--indigo); color: var(--white); border-color: var(--indigo); }
+        .btn-epub { background: transparent; color: var(--text); border-color: rgba(106,108,242,0.4); }
+        .btn-html { background: transparent; color: var(--text-muted); border-color: var(--border-soft); }
+        .btn-html:hover { border-color: var(--indigo); color: var(--white); }
+        .btn-epub:hover { background: var(--indigo-dim); color: var(--white); }
+        .download-note {
+            font-size: 0.75rem;
+            color: var(--text-faint);
+            margin-top: 18px !important;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            border-top: 1px solid var(--border-soft);
+            padding: 40px 24px;
+            text-align: center;
+        }
+        footer .footer-inner {
+            max-width: 760px;
+            margin: 0 auto;
+        }
+        footer p {
+            font-size: 0.78rem;
+            color: var(--text-faint);
+            margin-bottom: 8px;
+        }
+        footer a { color: var(--text-muted); text-decoration: none; }
+        footer a:hover { color: var(--indigo); }
+        .footer-copyright {
+            font-size: 0.75rem;
+            color: var(--text-faint);
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-soft);
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 600px) {
+            .hero { padding: 56px 20px 40px; }
+            .content { padding: 0 20px 60px; }
+            .cta-section { padding: 28px 20px; }
+            .tip-section { padding: 24px 16px; }
+            .phase-grid { grid-template-columns: 1fr 1fr; }
+            h2 { font-size: 1.3rem; }
+        }
+        @media (max-width: 400px) {
+            .phase-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav class="site-nav" aria-label="Site navigation">
+    <div class="nav-inner">
+        <a class="nav-brand" href="https://www.stuart-thomas.com">
+            Stuart Paul Thomas <span>/ Security Research</span>
+        </a>
+        <div class="nav-links">
+            <a href="https://www.stuart-thomas.com">Home</a>
+            <a href="https://www.stuart-thomas.com/security-research.html">Research</a>
+        </div>
+    </div>
+</nav>
+
+<!-- ── HERO ── -->
+<header class="hero">
+    <div class="hero-badge">Free Summary — Full Book Available</div>
+    <h1>macOS Security Research:<br><span class="accent">A Complete Framework</span></h1>
+    <p class="subtitle">Six phases. Thirty-nine years of experience. From PING to responsible disclosure — the methodology that gets findings fixed rather than exploited.</p>
+    <div class="hero-meta">
+        <span>✍ Stuart Paul Thomas</span>
+        <span>⌘ macOS / Darwin / XNU</span>
+        <span>🇬🇧 England &amp; Wales</span>
+        <span>© 2026 All Rights Reserved</span>
+    </div>
+</header>
+
+<!-- ── NOTICES ── -->
+<div class="content">
+
+    <!-- Copyright Notice -->
+    <div class="notice notice-copyright">
+        <strong class="notice-title">Copyright Notice</strong>
+        This summary is an abridged version of <strong><em>macOS Security Research: A Complete Framework</em></strong> by Stuart Paul Thomas. Copyright © 2026 Stuart Paul Thomas. All rights reserved. This free summary is provided for educational purposes only. No portion of this work may be reproduced, stored, or transmitted in any form without the prior written permission of the author, except brief quotations for review or educational commentary. The full book contains substantially more detail, worked examples, and methodology. <a href="#get-the-book" style="color:var(--indigo);">Get the full book →</a>
+    </div>
+
+    <!-- Legal Disclaimer -->
+    <div class="notice notice-legal">
+        <strong class="notice-title">Legal Disclaimer &amp; Responsible Use</strong>
+        This document is for <strong>educational purposes only</strong>. The methodologies described are intended solely for use on systems you own or have explicit written authorisation to test. The author makes no representations that any technique described is appropriate for your specific circumstances, jurisdiction, or legal environment. Nothing in this summary constitutes legal advice. Readers are solely responsible for ensuring compliance with all applicable laws before conducting any security research activity.
+    </div>
+
+    <!-- Computer Misuse Act Warning -->
+    <div class="notice notice-cma">
+        <strong class="notice-title">Computer Misuse Act 1990 — England &amp; Wales</strong>
+        Unauthorised access to computer systems is a criminal offence under the <strong>Computer Misuse Act 1990</strong>. This applies regardless of intent. Conducting security research on systems without explicit written authorisation from the system owner is illegal. Security laws vary by jurisdiction — verify compliance with the laws in your own country before acting on any information in this document. The author accepts no liability for unlawful use of this material.
+    </div>
+
+    <hr class="divider">
+
+    <!-- ── THE STORY ── -->
+    <div class="section-label">Where It Starts</div>
+    <h2>The Question That Started Everything</h2>
+
+    <p>In 1983, Mike Muuss was debugging a network problem at the University of Delaware. A gateway was silently dropping data — no error messages, no obvious cause. So he wrote a small programme: send an ICMP Echo Request, wait for a reply. A simple question: <em>Are you there?</em></p>
+    <p>He called it <strong>PING</strong>. Forty years later, every serious security researcher knows that PING reveals things it was never designed to reveal.</p>
+    <p>When you send a malformed PING, you're testing an assumption. The system receives it and has to make a choice: reject it, try to parse it, or something in between. That choice — replicated millions of times — becomes a fingerprint. And sometimes, if you're paying attention, it becomes a vulnerability.</p>
+
+    <blockquote>
+        <p>Security research isn't fundamentally about attack or defence. The engine underneath both is curiosity — the need to know what the system is <em>actually</em> doing, rather than what it's supposed to be doing.</p>
+        <cite>— Stuart Paul Thomas, macOS Security Research: A Complete Framework</cite>
+    </blockquote>
+
+    <p>My professional career started in 1994 at University College Scarborough — doing everything: helpdesk, training, tech support, web development. In 2001, seven years in, I wrote a SANS paper on ICMP crafting that forced me to be explicit about methodology for the first time. That discipline became the framework in this book. Behind the professional career was a longer obsession: a retired teacher's Commodore PET I'd fixed for £5 in 1987, when I was eleven. Curiosity predated everything else.</p>
+
+    <hr class="divider">
+
+    <!-- ── THE SIX PHASES ── -->
+    <div class="section-label">The Methodology</div>
+    <h2>The Six-Phase Framework</h2>
+
+    <div class="phases-intro">
+        <p>Effective security research isn't a single investigation — it's a structured process. The six phases below give you a repeatable methodology that produces findings you can defend, submit, and see fixed.</p>
+    </div>
+
+    <div class="phase-grid">
+        <div class="phase-card">
+            <span class="phase-number">PHASE 01</span>
+            <div class="phase-name">Scope</div>
+            <p class="phase-desc">Define what you're researching before you start. The most expensive mistake is six months of correct findings about the wrong thing.</p>
+        </div>
+        <div class="phase-card">
+            <span class="phase-number">PHASE 02</span>
+            <div class="phase-name">Recon</div>
+            <p class="phase-desc">Build the map before you investigate. Recon is not looking for vulnerabilities — it's understanding where they might live.</p>
+        </div>
+        <div class="phase-card">
+            <span class="phase-number">PHASE 03</span>
+            <div class="phase-name">Research Tracks</div>
+            <p class="phase-desc">Run multiple bounded investigations in parallel, each with a specific question, hypothesis, and evidence standard.</p>
+        </div>
+        <div class="phase-card">
+            <span class="phase-number">PHASE 04</span>
+            <div class="phase-name">Red-Team</div>
+            <p class="phase-desc">Stress-test your own findings before anyone else does. The gap between believing you have a vulnerability and proving it is everything.</p>
+        </div>
+        <div class="phase-card">
+            <span class="phase-number">PHASE 05</span>
+            <div class="phase-name">Submit</div>
+            <p class="phase-desc">Coordinate with vendors through the 90-day responsible disclosure timeline. Your research stops being yours at submission — make it count.</p>
+        </div>
+        <div class="phase-card">
+            <span class="phase-number">PHASE 06</span>
+            <div class="phase-name">Archive</div>
+            <p class="phase-desc">Document as if someone else will use your notes to continue the research. Because they will. Archive is how knowledge survives.</p>
+        </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- ── KEY PRINCIPLES ── -->
+    <div class="section-label">Core Principles</div>
+    <h2>What the Methodology Teaches</h2>
+
+    <div class="principle-list">
+        <div class="principle-item">
+            <span class="principle-icon">01</span>
+            <p class="principle-text"><strong>Specifications are aspirations. Code is reality.</strong> Security lives in the gap between what a specification says and what an implementation does. PING has had the same specification since 1981. Implementations have diverged ever since.</p>
+        </div>
+        <div class="principle-item">
+            <span class="principle-icon">02</span>
+            <p class="principle-text"><strong>Verify everything. Static analysis lies.</strong> A code review can show you something <em>might</em> be vulnerable. Only a working proof of concept shows you it <em>is</em>. Never submit a finding you can't reproduce on a real system.</p>
+        </div>
+        <div class="principle-item">
+            <span class="principle-icon">03</span>
+            <p class="principle-text"><strong>Responsible disclosure isn't a limitation. It's the point.</strong> Vendors work with researchers they trust. The security community respects work that's rigorous and responsible. Report findings in a way that gets them fixed, not exploited.</p>
+        </div>
+        <div class="principle-item">
+            <span class="principle-icon">04</span>
+            <p class="principle-text"><strong>The BSD cross-reference is your most underused tool on macOS.</strong> Darwin's networking and VFS code traces back to FreeBSD and OpenBSD. A vulnerability patched in FreeBSD is worth immediately checking in XNU. The CVE history is public — use it.</p>
+        </div>
+        <div class="principle-item">
+            <span class="principle-icon">05</span>
+            <p class="principle-text"><strong>Defence in depth buys time, not immunity.</strong> Code signing, SIP, ASLR, and Pointer Authentication each raise the cost of exploitation. None of them stops a determined attacker alone. Understanding what each control stops — and what it doesn't — is the researcher's contribution to defence.</p>
+        </div>
+        <div class="principle-item">
+            <span class="principle-icon">06</span>
+            <p class="principle-text"><strong>The quality of your research reflects the quality of your questions.</strong> Not the tools you use. Not the CVEs you've found. The questions. Are you asking the right things? Are you listening to what the answers actually say, rather than what you hoped they'd say?</p>
+        </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- ── WHAT'S IN THE BOOK ── -->
+    <div class="section-label">Full Book Contents</div>
+    <h2>What the Complete Framework Covers</h2>
+
+    <p>This summary gives you the spine. The full book gives you the muscle:</p>
+
+    <div class="principle-list">
+        <div class="principle-item">
+            <span class="principle-icon">Ch.1</span>
+            <p class="principle-text"><strong>Why PING Matters</strong> — The history of ICMP, what a 40-year-old tool still reveals about modern operating systems, and why methodology is the through-line.</p>
+        </div>
+        <div class="principle-item">
+            <span class="principle-icon">Ch.2</span>
+            <p class="principle-text"><strong>ICMP Crafting (2001)</strong> — The SANS Foundation research that built the framework. Fourteen years from a Commodore PET to a formal research methodology.</p>
+        </div>
+        <div class="principle-item">
+            <span class="principle-icon">Ch.3</span>
+            <p class="principle-text"><strong>The Six-Phase Framework</strong> — The complete methodology in detail. Scope documents, recon maps, research track templates, red-team protocols, vendor submission, and archive standards.</p>
+        </div>
+        <div class="principle-item">
+            <span class="principle-icon">Ch.4</span>
+            <p class="principle-text"><strong>Evidence Capture &amp; Proof of Concept</strong> — The gap between believing you have a vulnerability and proving you have one. PoC development, reproduction standards, and evidence quality.</p>
+        </div>
+        <div class="principle-item">
+            <span class="principle-icon">Ch.5</span>
+            <p class="principle-text"><strong>Writing for Vendors</strong> — The Day 1/45/90 timeline. How to write a disclosure that vendors actually act on. The craft of the first contact, the follow-up, and the deadline.</p>
+        </div>
+        <div class="principle-item">
+            <span class="principle-icon">Ch.6</span>
+            <p class="principle-text"><strong>The Red-Team Conversation</strong> — How to stress-test your own findings before submission. The two failure modes: findings that don't survive scrutiny, and findings that are real but can't be explained clearly.</p>
+        </div>
+        <div class="principle-item">
+            <span class="principle-icon">Ch.7</span>
+            <p class="principle-text"><strong>Responsible Disclosure</strong> — The legal framework (Computer Misuse Act 1990, England &amp; Wales). CVE assignment. Coordinated disclosure timelines. What happens when vendors go quiet.</p>
+        </div>
+        <div class="principle-item">
+            <span class="principle-icon">Ch.8</span>
+            <p class="principle-text"><strong>The macOS Security Landscape</strong> — XNU, Darwin, SIP, MACF, code signing, and notarisation. The BSD cross-reference technique. Where macOS research diverges from standard Unix research.</p>
+        </div>
+        <div class="principle-item">
+            <span class="principle-icon">Ch.9</span>
+            <p class="principle-text"><strong>Building Your Defence</strong> — What security research teaches about defence. Why the researcher who understands vulnerabilities builds better defences. Curiosity as the through-line from 1987 to now.</p>
+        </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- ── DOWNLOAD CTA ── -->
+    <div class="cta-section" id="get-the-book">
+        <h2>Download the Full Book — Free</h2>
+        <p>The complete framework: nine chapters, worked examples, macOS-specific techniques, vendor communication templates, and the full legal framework for England &amp; Wales. Completely free.</p>
+        <div class="btn-row">
+            <a href="macOS_Security_Research_A_Complete_Framework.pdf" class="btn-download btn-pdf" download>
+                ↓ PDF
+            </a>
+            <a href="macOS_Security_Research_A_Complete_Framework.epub" class="btn-download btn-epub" download>
+                ↓ EPUB
+            </a>
+            <a href="macOS_Security_Research_Book.html" class="btn-download btn-html">
+                Read Online →
+            </a>
+        </div>
+        <p class="download-note">PDF is print-ready on A4. EPUB works on Kindle, Apple Books, and all e-readers. No account required.</p>
+    </div>
+
+    <hr class="divider">
+
+    <!-- ── CLOSING QUOTE ── -->
+    <blockquote>
+        <p><em>Are you there?</em></p>
+        <cite>Still the most important question in security research. Ask it precisely. Listen carefully. Report honestly. — <em>macOS Security Research: A Complete Framework</em></cite>
+    </blockquote>
+
+    <hr class="divider">
+
+    <!-- ── FULL COPYRIGHT & NOTICES ── -->
+    <div class="notice notice-copyright">
+        <strong class="notice-title">Full Copyright &amp; Reproduction Notice</strong>
+        <strong>macOS Security Research: A Complete Framework — Free Summary.</strong><br>
+        Copyright © 2026 Stuart Paul Thomas. All rights reserved.<br><br>
+        This document is provided free of charge for educational purposes. You may share a link to this page freely. You may not reproduce, copy, redistribute, republish, display, sell, or create derivative works from this content without the express written permission of the author.<br><br>
+        Brief quotation (fewer than 50 words) for the purpose of review or academic commentary is permitted, provided attribution is given as: <em>Stuart Paul Thomas, macOS Security Research: A Complete Framework, 2026.</em><br><br>
+        AI-assisted drafting: this work was produced with assistance from Claude (Anthropic), Gemini (Google), and Grok (xAI) for drafting, review, and editorial purposes. This constitutes a reasonable adjustment under the Equality Act 2010, s.20 (the author is neurodivergent: autistic, ADHD). All content has been authored, reviewed, and is the intellectual property of Stuart Paul Thomas.<br><br>
+        This document contains no unpatched vulnerability details. Research methodology described is for lawful, authorised security research only. The author accepts no liability for misuse.
+    </div>
+
+    <div class="notice notice-legal">
+        <strong class="notice-title">AI Assistance &amp; Equality Act 2010, Section 20 — Reasonable Adjustments</strong>
+        The author is neurodivergent (autistic, ADHD). The use of AI tools (Claude, Gemini, Grok) in producing this work constitutes a <strong>reasonable adjustment within the meaning of Section 20 of the Equality Act 2010</strong>.<br><br>
+        Section 20 EA2010 imposes a positive duty to take reasonable steps to avoid substantial disadvantage to disabled persons arising from any provision, criterion, or practice. A blanket policy prohibiting AI use — applied without reasonable adjustments for disabled individuals — may constitute <strong>indirect discrimination under Section 19 EA2010</strong> and breach the Section 20 duty.<br><br>
+        All substantive content, methodology, findings, and opinions are the original intellectual work of Stuart Paul Thomas. AI tools were used for drafting assistance, review, and red-teaming — analogous to an editorial aide or assistant reader. The author is solely responsible for all content.
+    </div>
+
+</div><!-- /content -->
+
+<!-- ── FOOTER ── -->
+<footer>
+    <div class="footer-inner">
+        <p><a href="https://www.stuart-thomas.com">stuart-thomas.com</a> &nbsp;·&nbsp; <a href="https://www.stuart-thomas.com/security-research.html">Security Research</a></p>
+        <div class="footer-copyright">
+            <p>© 2026 Stuart Paul Thomas. All rights reserved.</p>
+            <p>England &amp; Wales. Computer Misuse Act 1990 applies. Use only on systems you own or have written authorisation to test.</p>
+            <p style="margin-top:8px;"><em>macOS Security Research: A Complete Framework</em> — ISBN / ASIN available at point of publication.</p>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Glossary — macOS Security Research: A Complete Framework</title>
+  <meta name="description" content="A searchable glossary of terms used in macOS security research — kernel internals, vulnerability research, mathematical methods, and tooling.">
+  <link rel="canonical" href="https://stuart-thomas.com/book/macos-security-research/glossary.html">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="Stuart Paul Thomas">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Glossary — macOS Security Research">
+  <meta property="og:description" content="Searchable glossary of macOS security research terminology.">
+  <meta property="og:url" content="https://stuart-thomas.com/book/macos-security-research/glossary.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #050508; --surface: #0c0c12; --surface-2: #12121c;
+      --text: #e8e6f0; --text-dim: #8888a0; --text-faint: #7a7a96;
+      --accent-1: #6a6cf2; --accent-2: #8b5cf6; --accent-3: #ec4899; --accent-4: #10b981;
+      --accent-btn: #4f46e5;
+      --radius: 16px; --radius-sm: 8px;
+    }
+    html { background: var(--bg); color: var(--text); scroll-behavior: smooth; scroll-padding-top: 200px; }
+    body { font-family: 'Inter', -apple-system, sans-serif; line-height: 1.65; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+    ::selection { background: var(--accent-btn); color: #fff; }
+    a { color: var(--accent-1); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--accent-2); }
+
+    .skip-link { position: absolute; top: -100%; left: 16px; z-index: 9999; padding: 12px 20px; background: var(--accent-btn); color: #fff; font-size: 0.9rem; font-weight: 600; border-radius: 0 0 var(--radius-sm) var(--radius-sm); text-decoration: none; }
+    .skip-link:focus { top: 0; }
+    :focus-visible { outline: 2px solid var(--accent-1); outline-offset: 3px; border-radius: 4px; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+      html { scroll-behavior: auto; }
+    }
+
+    /* ── STICKY NAV ── */
+    .site-nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(5, 5, 8, 0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      padding: 0 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 56px;
+    }
+    .site-nav .nav-links { display: flex; gap: 24px; align-items: center; }
+    .site-nav .nav-link {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; font-weight: 500;
+      color: var(--text-faint); text-decoration: none;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      transition: color 0.2s;
+      padding: 10px 4px; min-height: 44px;
+      display: inline-flex; align-items: center;
+    }
+    .site-nav .nav-link:hover { color: var(--accent-1); }
+    .site-nav .nav-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px;
+      background: rgba(106, 108, 242, 0.08);
+      border: 1px solid rgba(106, 108, 242, 0.2);
+      border-radius: 100px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; font-weight: 600;
+      color: var(--accent-1);
+      letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    @media (max-width: 600px) { .site-nav { padding: 0 20px; } }
+
+    /* ── HEADER ── */
+    .page-header {
+      position: relative; padding: 48px 40px 24px; max-width: 1100px; margin: 0 auto;
+    }
+    .header-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 5px 14px;
+      background: rgba(106, 108, 242, 0.08);
+      border: 1px solid rgba(106, 108, 242, 0.2);
+      border-radius: 100px;
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--accent-1); margin-bottom: 18px;
+    }
+    .page-header h1 {
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+      font-weight: 800; line-height: 1.1;
+      letter-spacing: -0.02em; margin-bottom: 12px;
+    }
+    .page-header h1 .gradient {
+      background: linear-gradient(135deg, var(--accent-1) 0%, var(--accent-2) 60%, var(--accent-3) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .page-header p {
+      color: var(--text-dim); font-size: 1rem; line-height: 1.7;
+      max-width: 760px;
+    }
+    .page-header .stats-line {
+      margin-top: 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--text-faint);
+    }
+    .page-header .stats-line strong { color: var(--accent-1); font-weight: 600; }
+
+    /* ── STICKY CONTROLS BAR ── */
+    .controls {
+      position: sticky;
+      top: 56px;
+      z-index: 90;
+      background: rgba(5, 5, 8, 0.95);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      padding: 16px 40px;
+    }
+    .controls-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .search-wrap {
+      position: relative;
+    }
+    .search-wrap::before {
+      content: '🔍';
+      position: absolute;
+      left: 18px; top: 50%; transform: translateY(-50%);
+      font-size: 1rem; opacity: 0.6;
+      pointer-events: none;
+    }
+    #search {
+      width: 100%;
+      padding: 14px 48px 14px 48px;
+      background: var(--surface);
+      border: 1px solid rgba(106, 108, 242, 0.2);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.98rem;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    #search:focus {
+      outline: none;
+      border-color: var(--accent-1);
+      box-shadow: 0 0 0 3px rgba(106, 108, 242, 0.15);
+    }
+    #search::placeholder { color: var(--text-faint); }
+    .clear-search {
+      position: absolute;
+      right: 14px; top: 50%; transform: translateY(-50%);
+      background: rgba(255,255,255,0.06);
+      border: none;
+      color: var(--text-dim);
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 0.75rem;
+      display: none;
+      align-items: center; justify-content: center;
+    }
+    .clear-search.show { display: flex; }
+    .clear-search:hover { background: rgba(255,255,255,0.12); color: var(--text); }
+
+    .alpha-nav {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      justify-content: center;
+    }
+    .alpha-link {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem; font-weight: 600;
+      color: var(--text-faint);
+      padding: 6px 10px;
+      border-radius: 6px;
+      text-decoration: none;
+      min-width: 32px; text-align: center;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+    }
+    .alpha-link:hover { color: var(--accent-1); background: rgba(106, 108, 242, 0.08); border-color: rgba(106, 108, 242, 0.15); }
+    .alpha-link.disabled { opacity: 0.25; cursor: not-allowed; pointer-events: none; }
+
+    /* ── RESULTS COUNTER ── */
+    .results-info {
+      max-width: 1100px; margin: 24px auto 0; padding: 0 40px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--text-faint);
+      min-height: 1.4em;
+    }
+    .results-info .count { color: var(--accent-1); font-weight: 600; }
+
+    /* ── GLOSSARY ── */
+    .glossary {
+      max-width: 1100px; margin: 16px auto 80px; padding: 0 40px;
+    }
+    .letter-section {
+      margin-top: 48px;
+    }
+    .letter-section:first-of-type { margin-top: 24px; }
+    .letter-heading {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--accent-1);
+      letter-spacing: -0.02em;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(106, 108, 242, 0.2);
+      scroll-margin-top: 220px;
+    }
+    .terms {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+      gap: 14px;
+    }
+    .term-card {
+      padding: 22px 26px;
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.04);
+      border-radius: var(--radius);
+      transition: border-color 0.3s, transform 0.2s;
+    }
+    .term-card:hover {
+      border-color: rgba(106, 108, 242, 0.2);
+      transform: translateY(-1px);
+    }
+    .term-card.hidden { display: none; }
+    .term-card.match-highlight {
+      border-color: rgba(106, 108, 242, 0.4);
+      box-shadow: 0 0 30px rgba(106, 108, 242, 0.08);
+    }
+
+    .term-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+      letter-spacing: -0.01em;
+    }
+    .term-name .term-abbrev {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--accent-1);
+      margin-left: 6px;
+    }
+    .term-tags {
+      display: flex; flex-wrap: wrap; gap: 4px;
+      margin: 6px 0 12px;
+    }
+    .term-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+    .term-tag.kernel { background: rgba(236, 72, 153, 0.1); color: #ec4899; border: 1px solid rgba(236, 72, 153, 0.2); }
+    .term-tag.macos  { background: rgba(106, 108, 242, 0.1); color: var(--accent-1); border: 1px solid rgba(106, 108, 242, 0.2); }
+    .term-tag.vulnclass { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+    .term-tag.tool   { background: rgba(16, 185, 129, 0.1); color: var(--accent-4); border: 1px solid rgba(16, 185, 129, 0.2); }
+    .term-tag.math   { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); }
+    .term-tag.process{ background: rgba(139, 92, 246, 0.1); color: var(--accent-2); border: 1px solid rgba(139, 92, 246, 0.2); }
+    .term-tag.legal  { background: rgba(122, 122, 150, 0.1); color: var(--text-faint); border: 1px solid rgba(122, 122, 150, 0.2); }
+
+    .term-def {
+      font-size: 0.92rem;
+      color: var(--text-dim);
+      line-height: 1.7;
+    }
+    .term-def code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      background: rgba(106, 108, 242, 0.08);
+      border: 1px solid rgba(106, 108, 242, 0.12);
+      padding: 1px 6px;
+      border-radius: 4px;
+      color: var(--accent-1);
+    }
+    .term-def .see-also {
+      display: block;
+      margin-top: 10px;
+      font-size: 0.82rem;
+      color: var(--text-faint);
+    }
+    .term-def .see-also strong { color: var(--text-dim); font-weight: 500; }
+
+    .empty-state {
+      text-align: center; padding: 80px 20px;
+      color: var(--text-faint);
+    }
+    .empty-state h2 {
+      font-size: 1.2rem; font-weight: 600; color: var(--text-dim);
+      margin-bottom: 8px;
+    }
+    .empty-state p { font-size: 0.92rem; }
+
+    /* ── FOOTER ── */
+    footer {
+      max-width: 1100px; margin: 0 auto;
+      padding: 40px; border-top: 1px solid rgba(255,255,255,0.04);
+      display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 16px;
+    }
+    footer p { font-size: 0.8rem; color: var(--text-faint); }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a {
+      font-size: 0.8rem; color: var(--text-faint);
+      padding: 10px 4px; min-height: 44px; display: inline-flex; align-items: center;
+    }
+    .footer-links a:hover { color: var(--accent-1); }
+
+    @media (max-width: 900px) {
+      .site-nav { padding: 0 24px; }
+      .page-header { padding: 36px 24px 16px; }
+      .controls { padding: 14px 24px; top: 56px; }
+      .results-info { padding: 0 24px; }
+      .glossary { padding: 0 24px; margin: 12px auto 60px; }
+      .terms { grid-template-columns: 1fr; }
+      footer { padding: 32px 24px; }
+    }
+    @media (max-width: 500px) {
+      .alpha-link { padding: 5px 8px; font-size: 0.72rem; min-width: 28px; }
+    }
+
+    /* Privacy banner */
+    .privacy-banner {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 9000;
+      background: rgba(12, 12, 18, 0.95); backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 14px 40px; display: flex; justify-content: center;
+      align-items: center; gap: 16px; flex-wrap: wrap;
+      font-size: 0.82rem; color: #8888a0;
+      transform: translateY(100%); transition: transform 0.4s ease;
+    }
+    .privacy-banner.show { transform: translateY(0); }
+    .privacy-banner a { color: var(--accent-1); font-weight: 500; }
+    .privacy-banner button {
+      background: rgba(106,108,242,0.12); border: 1px solid rgba(106,108,242,0.25);
+      color: var(--accent-1); padding: 6px 16px; border-radius: 6px; cursor: pointer;
+      font-size: 0.78rem; font-weight: 600; font-family: inherit;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <nav class="site-nav" aria-label="Main navigation">
+    <div class="nav-links">
+      <a href="/" class="nav-link">&larr; Home</a>
+      <a href="/book/macos-security-research/" class="nav-link">Book</a>
+      <a href="/security-research.html" class="nav-link">Research</a>
+    </div>
+    <span class="nav-badge">Glossary</span>
+  </nav>
+
+  <header class="page-header">
+    <div class="header-badge" aria-label="Glossary">📚 Glossary</div>
+    <h1>Glossary &mdash; <span class="gradient">macOS Security Research</span></h1>
+    <p>A searchable companion to the book. Covers macOS &amp; Darwin/XNU internals, vulnerability research methodology, mathematical foundations, tooling, and the legal/ethical context. Type to filter, click a letter to jump.</p>
+    <div class="stats-line"><strong id="totalCount">0</strong> terms &middot; updated April 2026 &middot; CC BY-SA 4.0</div>
+  </header>
+
+  <div class="controls" role="search">
+    <div class="controls-inner">
+      <div class="search-wrap">
+        <input id="search" type="search" placeholder="Search terms — e.g. PING, TOCTOU, MACF, Cross-Reference…" aria-label="Search glossary terms" autocomplete="off">
+        <button class="clear-search" id="clearBtn" aria-label="Clear search">✕</button>
+      </div>
+      <nav class="alpha-nav" id="alphaNav" aria-label="Alphabetical navigation"></nav>
+    </div>
+  </div>
+
+  <div class="results-info" id="resultsInfo" aria-live="polite"></div>
+
+  <main id="main-content" class="glossary" id="glossaryMain">
+    <!-- Terms injected by JS for searchability and consistent rendering -->
+  </main>
+
+  <div class="empty-state" id="emptyState" style="display:none">
+    <h2>No matches.</h2>
+    <p>Try a different search term, or <a href="#" id="resetSearch">show all entries</a>.</p>
+  </div>
+
+  <footer>
+    <p>&copy; 2026 Stuart Paul Thomas &middot; CC BY-SA 4.0</p>
+    <nav aria-label="Footer navigation" class="footer-links">
+      <a href="/book/macos-security-research/">Book</a>
+      <a href="/macos-security-framework.html">TL;DR</a>
+      <a href="/">Home</a>
+      <a href="/privacy.html">Privacy</a>
+    </nav>
+  </footer>
+
+  <div class="privacy-banner" id="privacyBanner" role="status">
+    <span>This site uses no cookies or tracking. Server logs only.</span>
+    <a href="/privacy.html">Privacy Notice</a>
+    <button onclick="document.getElementById('privacyBanner').remove();localStorage.setItem('privacy-seen','1')" aria-label="Dismiss">OK</button>
+  </div>
+
+  <script>
+    // ── GLOSSARY DATA ──────────────────────────────────────
+    // tags: kernel | macos | vulnclass | tool | math | process | legal
+    const TERMS = [
+      // ── A
+      { name: 'AArch64', abbrev: 'ARM64', tags: ['macos'], def: 'The 64-bit ARM instruction set used on Apple Silicon Macs and modern iOS devices.' },
+      { name: 'Apple Open Source Distributions', abbrev: 'apple-oss-distributions', tags: ['macos'], def: 'Apple\'s public source code repository at <a href="https://github.com/apple-oss-distributions/" target="_blank" rel="noopener">github.com/apple-oss-distributions</a>. Includes XNU kernel sources, Mach, BSD layer, and many userland utilities. Read it. <em>(Chapter 8.)</em>' },
+      { name: 'Archive', tags: ['process'], def: 'Phase 6 of the framework. Documenting findings, organising artefacts, and writing the postmortem most researchers skip. The phase that makes you a better researcher rather than just a more prolific one. <em>(Chapter 3.)</em>' },
+      { name: 'ASLR', abbrev: 'Address Space Layout Randomisation', tags: ['kernel'], def: 'Mitigation that randomises the load addresses of binaries, libraries, stack and heap to make memory corruption exploits harder. One of the layered defences discussed in Chapter 9.' },
+      { name: 'Attack Surface', tags: ['process'], def: 'The total set of inputs, interfaces, and code paths exposed to an untrusted source. Mapping the attack surface is the core task of the <strong>Recon</strong> phase. <em>(Chapter 3.)</em>' },
+
+      // ── B
+      { name: 'Boundary Condition', tags: ['vulnclass'], def: 'A point where a system\'s assumptions about input or state are most likely to break down. Looking for boundary conditions is the heart of the methodology.' },
+      { name: 'BSD Layer', tags: ['kernel','macos'], def: 'The Berkeley-derived portion of XNU, sitting on top of the Mach microkernel. Handles process management, credential handling, filesystem, and most POSIX semantics. Substantial code lineage shared with FreeBSD &mdash; the basis for the cross-reference technique. <em>(Chapter 8.)</em>' },
+      { name: 'Bug Bounty', tags: ['process','legal'], def: 'Programme through which a vendor pays researchers for responsibly-disclosed vulnerabilities. Apple Security Bounty is the relevant programme for Apple platforms.' },
+
+      // ── C
+      { name: 'Codesign', tags: ['macos'], def: 'Apple\'s code-signing system. All executable code on macOS must be signed by a trusted authority. One of the layered defences in Chapter 9.' },
+      { name: 'Cross-Reference (BSD-to-XNU)', tags: ['process'], def: 'The technique of using FreeBSD/OpenBSD security advisories as an annotated security changelog for Darwin\'s shared codebase. When a BSD CVE lands, check whether XNU\'s implementation of the same path has the same gap. The book\'s headline macOS technique. <em>(Chapter 8.)</em>' },
+      { name: 'Coordinated Disclosure', tags: ['process','legal'], def: 'Vulnerability disclosure practice in which the researcher and vendor agree timelines for patching before public disclosure. Industry-standard window is 90 days. Synonymous with <strong>responsible disclosure</strong>. <em>(Chapter 7.)</em>' },
+      { name: 'CVE', abbrev: 'Common Vulnerabilities and Exposures', tags: ['process','legal'], def: 'Globally unique identifier for a specific vulnerability, e.g. CVE-2019-5596. Assigned by MITRE or a CNA (CVE Numbering Authority).' },
+      { name: 'CMA', abbrev: 'Computer Misuse Act 1990', tags: ['legal'], def: 'UK statute criminalising unauthorised access to computer systems. Vulnerability research must be conducted within authorised scope. Cited throughout the book as the legal foundation for English-law security research.' },
+
+      // ── D
+      { name: 'Darwin', tags: ['macos','kernel'], def: 'Open-source operating system core that underlies macOS, iOS, watchOS and tvOS. Combines the <strong>XNU</strong> kernel with BSD userland and Apple components. Substantial BSD lineage; see <strong>Cross-Reference (BSD-to-XNU)</strong>.' },
+      { name: 'Defence in Depth', tags: ['kernel','process'], def: 'Layered security where no single control is expected to be perfect. Each layer (codesign, ASLR, DEP/NX, PAC) raises the cost of exploitation. Discussed in Chapter 9 &mdash; the practical meaning, not the slogan.' },
+      { name: 'DEP / NX', abbrev: 'Data Execution Prevention / No-Execute', tags: ['kernel'], def: 'Memory page attribute preventing code execution from data regions. Combined with W^X (Write XOR Execute) prevents the simplest forms of code injection. Layered defence in Chapter 9.' },
+
+      // ── E
+      { name: 'Evidence Standard', tags: ['process'], def: 'The level of proof required for a Research Track to be considered closed. Decided <em>before</em> investigation starts, so curiosity doesn\'t stretch the bar. The discipline that prevents you fooling yourself. <em>(Chapter 3.)</em>' },
+      { name: 'Equality Act 2010, Section 20', tags: ['legal'], def: 'UK statute imposing a positive duty to make reasonable adjustments to avoid substantial disadvantage to disabled persons. The book uses AI tools (Claude, Gemini, Grok) as a declared reasonable adjustment under this provision. <em>(Legal Disclaimer.)</em>' },
+
+      // ── F
+      { name: 'FreeBSD Security Advisories', tags: ['process'], def: 'The FreeBSD project\'s public CVE history, archived at <code>security.freebsd.org/advisories</code>. Combined with OpenBSD errata, forms an annotated security changelog for Darwin. <em>(Chapter 8.)</em>' },
+      { name: 'FreeBSD-SA-19:02', abbrev: 'CVE-2019-5596', tags: ['vulnclass','kernel'], def: 'File descriptor reference count leak in UNIX-domain socket handling &mdash; a worked example of the cross-reference technique in Chapter 8. The receiving process supplying a too-small buffer for control message file descriptors could wrap a refcount, freeing the underlying file structure prematurely.' },
+
+      // ── I
+      { name: 'ICMP', abbrev: 'Internet Control Message Protocol', tags: ['process'], def: 'RFC 792 (1981). The protocol underlying PING. The author\'s 2001 SANS paper on ICMP crafting is the methodology origin of the book. <em>(Chapter 2.)</em>' },
+      { name: 'IOKit', tags: ['kernel','macos'], def: 'Apple\'s C++ framework for writing device drivers. <strong>IOKit user clients</strong> expose driver functionality to userland and are a common attack surface. Apple-specific architecture &mdash; the cross-reference technique does not help here. <em>(Chapter 8.)</em>' },
+      { name: 'Integer Overflow', tags: ['vulnclass'], def: 'Arithmetic that wraps around the maximum representable value. Common in size calculations and allocation paths. Perennial vulnerability class across Mach, BSD, and IOKit code. <em>(Chapter 8.)</em>' },
+
+      // ── M
+      { name: 'MACF', abbrev: 'Mandatory Access Control Framework', tags: ['kernel','macos'], def: 'Hook-based authorisation framework throughout the XNU kernel. Apple-specific architecture. Missing or bypassable hooks are a productive vulnerability class. <em>(Chapter 8.)</em>' },
+      { name: 'Mach', tags: ['kernel'], def: 'Microkernel architecture underlying XNU. Provides Mach ports (capability-based IPC), tasks, threads, and virtual memory. Different privilege model and exploitation primitives from the BSD layer &mdash; know which layer you\'re in. <em>(Chapter 8.)</em>' },
+      { name: 'Mach Port', tags: ['kernel','macos'], def: 'Capability-based IPC channel in XNU. Send rights, receive rights, dead names. Use-after-free in Mach port handling is a recurring vulnerability class &mdash; ports are reference-counted and lifecycle races in complex IPC sequences are productive ground. <em>(Chapter 8.)</em>' },
+      { name: 'Mach-O', tags: ['macos'], def: 'Executable file format used on macOS, iOS and Darwin. Contains load commands, segments, and (on Apple Silicon) PAC-signed pointers.' },
+      { name: 'Methodology', tags: ['process'], def: 'The discipline of <em>how</em> you find vulnerabilities, not just what you find. The whole point of the book. The framework is one expression of methodology; the principles (Scope, Evidence, Red-Team, Archive) are the deeper layer.' },
+      { name: 'Mike Muuss', tags: ['process'], def: 'Author of PING in 1983 at the University of Delaware. Wrote it to debug a network problem &mdash; sent ICMP Echo Requests one packet at a time. The book\'s through-line. <em>(Chapter 1, Chapter 9.)</em>' },
+
+      // ── N
+      { name: 'NCSC', abbrev: 'National Cyber Security Centre', tags: ['legal'], def: 'UK government body advising on cyber security. Operates a vulnerability disclosure programme and incident reporting service.' },
+      { name: 'Notarisation', tags: ['macos','process'], def: 'Apple\'s automated security review of distributed software. Required for apps distributed outside the Mac App Store on macOS 10.15+. Layered defence in Chapter 9.' },
+
+      // ── O
+      { name: 'OpenBSD Errata', tags: ['process'], def: 'OpenBSD\'s public security errata at <code>openbsd.org/errata.html</code>. The other half of the BSD-to-XNU cross-reference source set. <em>(Chapter 8.)</em>' },
+
+      // ── P
+      { name: 'PAC', abbrev: 'Pointer Authentication Code', tags: ['kernel','macos'], def: 'ARM64e mitigation: function pointers carry a cryptographic MAC in unused address bits, verified before use. Defeats simple ROP/JOP. One of the layered defences in Chapter 9.' },
+      { name: 'PING', tags: ['process'], def: 'The book\'s metaphor and through-line. Mike Muuss\'s 1983 ICMP Echo Request tool. The simplest possible "are you there?" query that, when probed carefully, reveals everything about a system\'s assumptions. Not a phase of the framework &mdash; the lens through which the methodology is taught. <em>(Chapter 1, Chapter 9.)</em>' },
+      { name: 'PoC', abbrev: 'Proof of Concept', tags: ['process'], def: 'Code that demonstrates a vulnerability is reachable and exploitable. Must be <em>minimal, reliable, documented, reproducible, safe, and focused</em>. Static analysis lies; a working PoC does not. <em>(Chapter 4.)</em>' },
+      { name: 'Postmortem', tags: ['process'], def: 'Honest assessment of what you got right and what you got wrong, written after a finding ships. The part of the Archive phase most researchers skip &mdash; and the part with the highest return on investment. <em>(Chapter 3.)</em>' },
+
+      // ── R
+      { name: 'Recon', tags: ['process'], def: 'Phase 2 of the framework. Mapping the attack surface before writing test code. Recon is not investigation &mdash; it builds the map that tells you where to investigate. The act of drawing it forces gaps to surface. <em>(Chapter 3.)</em>' },
+      { name: 'Red-Team', tags: ['process'], def: 'Phase 4 of the framework. Hand your work to someone whose job is to break your reasoning. The red-teamer who is hardest on your findings is the most valuable. <em>(Chapter 3, Chapter 6.)</em>' },
+      { name: 'Research Track', tags: ['process'], def: 'A bounded investigation with a specific question, hypothesis, method, and pre-decided evidence standard. Multiple tracks run in parallel during Phase 3 of the framework. <em>(Chapter 3.)</em>' },
+      { name: 'Responsible Disclosure', tags: ['process','legal'], def: 'Reporting vulnerabilities to vendors privately, giving them time to patch before public disclosure. Synonymous with coordinated disclosure. The 90-day standard is industry default. <em>(Chapter 5, Chapter 7.)</em>' },
+      { name: 'RFC 792', tags: ['process'], def: 'The 1981 specification for Internet Control Message Protocol. The text against which every PING implementation\'s divergence is measured. Foundation reading for the book. <em>(Chapter 1, Chapter 2.)</em>' },
+
+      // ── S
+      { name: 'Sandbox', tags: ['macos','kernel'], def: 'macOS kernel-enforced restriction of process capabilities via a Scheme-like profile language. Apple-specific architecture. Defines what code can do once executing. <em>(Chapter 8.)</em>' },
+      { name: 'SANS Foundation', tags: ['process'], def: 'The 2001 paper on ICMP crafting that taught the author the discipline of methodology. Reference point for Chapter 2. The work that became the framework you\'re reading.' },
+      { name: 'Scope', tags: ['process'], def: 'Phase 1 of the framework. Defining what you\'re investigating and what you\'re not. The most underrated phase. The most expensive mistake in security research is six months of correct findings about the wrong thing. <em>(Chapter 3.)</em>' },
+      { name: 'SIP', abbrev: 'System Integrity Protection', tags: ['macos','kernel'], def: 'macOS protection limiting what even the root user can modify. Significant architectural departure that changes the threat model. Understanding what SIP does and doesn\'t protect is prerequisite to assessing macOS vulnerability impact. <em>(Chapter 8.)</em>' },
+      { name: 'Submission', tags: ['process'], def: 'Phase 5 of the framework. Coordinating with the vendor under the 90-day standard. Write clearly, be specific, make the vendor\'s job easy. Patience is the job. <em>(Chapter 3, Chapter 5.)</em>' },
+
+      // ── T
+      { name: 'TCC', abbrev: 'Transparency, Consent, Control', tags: ['macos'], def: 'macOS user-consent framework gating access to private data. Apple-specific architecture &mdash; the cross-reference technique does not apply. <em>(Chapter 8.)</em>' },
+      { name: 'TOCTOU', abbrev: 'Time-of-Check to Time-of-Use', tags: ['vulnclass'], def: 'Race condition where a check (e.g., file ownership) and a use (e.g., file read) are non-atomic, allowing an attacker to swap the underlying object between them. Recurring vulnerability class in BSD credential handling. <em>(Chapter 8.)</em>' },
+
+      // ── U
+      { name: 'UAF', abbrev: 'Use After Free', tags: ['vulnclass'], def: 'Vulnerability where memory is accessed after being freed, potentially under attacker control. The classic Mach port lifecycle bug. <em>(Chapter 8.)</em>' },
+
+      // ── V
+      { name: 'Vulnerability Class', tags: ['vulnclass','process'], def: 'A pattern of vulnerability shared across many specific bugs &mdash; UAF, TOCTOU, integer overflow, MACF bypass. The unit at which methodology operates: hunt classes, find specific instances. <em>(Chapter 8.)</em>' },
+
+      // ── X
+      { name: 'XNU', tags: ['kernel','macos'], def: '"X is Not Unix" &mdash; the kernel underlying macOS, iOS, watchOS and tvOS. Hybrid combining Mach (microkernel), BSD (POSIX), IOKit (drivers), and libkern. Source published via apple-oss-distributions. <em>(Chapter 8.)</em>' },
+      { name: 'XPC', tags: ['macos'], def: 'Apple\'s preferred IPC mechanism. Type-safe, sandbox-friendly, lifecycle-managed. XPC services are a primary attack surface &mdash; messages from less-privileged contexts reaching higher-privileged services.' },
+
+      // ── 9
+      { name: '90-Day Standard', tags: ['process','legal'], def: 'Industry-standard responsible disclosure window. Day 1 the vendor receives the report; days 1&ndash;90 they develop and test a patch; day 90+ public disclosure permitted. Long enough for a serious fix; short enough that research is not held indefinitely. <em>(Chapter 7.)</em>' },
+    ];
+
+    // ── Helper: tag display labels ────────────────────────
+    const TAG_LABELS = {
+      kernel: 'Kernel',
+      macos: 'macOS',
+      vulnclass: 'Vuln Class',
+      tool: 'Tool',
+      math: 'Math',
+      process: 'Process',
+      legal: 'Legal',
+    };
+
+    // ── Render terms grouped by letter ────────────────────
+    function renderTerms() {
+      const main = document.getElementById('glossaryMain');
+      main.innerHTML = '';
+
+      // Group by first letter
+      const grouped = {};
+      TERMS.forEach(t => {
+        const letter = t.name[0].toUpperCase();
+        if (!grouped[letter]) grouped[letter] = [];
+        grouped[letter].push(t);
+      });
+
+      const letters = Object.keys(grouped).sort();
+
+      letters.forEach(letter => {
+        const section = document.createElement('section');
+        section.className = 'letter-section';
+        section.dataset.letter = letter;
+
+        const heading = document.createElement('h2');
+        heading.className = 'letter-heading';
+        heading.id = 'letter-' + letter;
+        heading.textContent = letter;
+        section.appendChild(heading);
+
+        const grid = document.createElement('div');
+        grid.className = 'terms';
+
+        grouped[letter].sort((a, b) => a.name.localeCompare(b.name));
+        grouped[letter].forEach(t => {
+          const card = document.createElement('article');
+          card.className = 'term-card';
+          card.dataset.searchText = (t.name + ' ' + (t.abbrev || '') + ' ' + t.def).toLowerCase();
+
+          const nameEl = document.createElement('h3');
+          nameEl.className = 'term-name';
+          nameEl.textContent = t.name;
+          if (t.abbrev) {
+            const ab = document.createElement('span');
+            ab.className = 'term-abbrev';
+            ab.textContent = t.abbrev;
+            nameEl.appendChild(ab);
+          }
+          card.appendChild(nameEl);
+
+          if (t.tags && t.tags.length) {
+            const tagsEl = document.createElement('div');
+            tagsEl.className = 'term-tags';
+            t.tags.forEach(tag => {
+              const tEl = document.createElement('span');
+              tEl.className = 'term-tag ' + tag;
+              tEl.textContent = TAG_LABELS[tag] || tag;
+              tagsEl.appendChild(tEl);
+            });
+            card.appendChild(tagsEl);
+          }
+
+          const defEl = document.createElement('div');
+          defEl.className = 'term-def';
+          defEl.innerHTML = t.def;
+          card.appendChild(defEl);
+
+          grid.appendChild(card);
+        });
+
+        section.appendChild(grid);
+        main.appendChild(section);
+      });
+
+      // Build alpha nav
+      const alphaNav = document.getElementById('alphaNav');
+      alphaNav.innerHTML = '';
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(L => {
+        const a = document.createElement('a');
+        a.href = '#letter-' + L;
+        a.className = 'alpha-link' + (letters.includes(L) ? '' : ' disabled');
+        a.textContent = L;
+        a.setAttribute('aria-label', 'Jump to ' + L);
+        alphaNav.appendChild(a);
+      });
+
+      document.getElementById('totalCount').textContent = TERMS.length;
+      updateResultsInfo(TERMS.length, TERMS.length);
+    }
+
+    function updateResultsInfo(matched, total) {
+      const info = document.getElementById('resultsInfo');
+      if (matched === total) {
+        info.innerHTML = `Showing all <span class="count">${total}</span> entries.`;
+      } else {
+        info.innerHTML = `<span class="count">${matched}</span> of ${total} entries match.`;
+      }
+    }
+
+    // ── Search ────────────────────────────────────────────
+    function applyFilter(query) {
+      query = query.trim().toLowerCase();
+      const cards = document.querySelectorAll('.term-card');
+      let matched = 0;
+      const visibleLetters = new Set();
+
+      cards.forEach(card => {
+        const text = card.dataset.searchText;
+        if (!query || text.includes(query)) {
+          card.classList.remove('hidden');
+          matched++;
+          const section = card.closest('.letter-section');
+          if (section) visibleLetters.add(section.dataset.letter);
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+
+      // Hide letter sections with no visible terms
+      document.querySelectorAll('.letter-section').forEach(s => {
+        s.style.display = visibleLetters.has(s.dataset.letter) ? '' : 'none';
+      });
+
+      // Update alpha nav: dim letters with no matches
+      document.querySelectorAll('.alpha-link').forEach(a => {
+        const letter = a.textContent;
+        if (!query) {
+          a.classList.toggle('disabled', !visibleLetters.has(letter) && a.classList.contains('disabled'));
+        }
+      });
+
+      // Empty state
+      const empty = document.getElementById('emptyState');
+      const main = document.getElementById('glossaryMain');
+      if (matched === 0 && query) {
+        empty.style.display = 'block';
+        main.style.display = 'none';
+      } else {
+        empty.style.display = 'none';
+        main.style.display = '';
+      }
+
+      updateResultsInfo(matched, TERMS.length);
+
+      // Show/hide clear button
+      const clearBtn = document.getElementById('clearBtn');
+      clearBtn.classList.toggle('show', !!query);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderTerms();
+
+      const search = document.getElementById('search');
+      const clearBtn = document.getElementById('clearBtn');
+      const reset = document.getElementById('resetSearch');
+
+      let debounce;
+      search.addEventListener('input', () => {
+        clearTimeout(debounce);
+        debounce = setTimeout(() => applyFilter(search.value), 80);
+      });
+
+      clearBtn.addEventListener('click', () => {
+        search.value = '';
+        applyFilter('');
+        search.focus();
+      });
+
+      reset.addEventListener('click', e => {
+        e.preventDefault();
+        search.value = '';
+        applyFilter('');
+        search.focus();
+      });
+
+      // Keyboard: '/' to focus search (like GitHub)
+      document.addEventListener('keydown', e => {
+        if (e.key === '/' && document.activeElement !== search && !e.metaKey && !e.ctrlKey) {
+          e.preventDefault();
+          search.focus();
+        }
+        if (e.key === 'Escape' && document.activeElement === search) {
+          search.value = '';
+          applyFilter('');
+        }
+      });
+
+      // Privacy banner
+      if (!localStorage.getItem('privacy-seen')) {
+        const b = document.getElementById('privacyBanner');
+        if (b) setTimeout(() => b.classList.add('show'), 800);
+      } else {
+        const b = document.getElementById('privacyBanner');
+        if (b) b.remove();
+      }
+    });
+  </script>
+
+</body>
+</html>

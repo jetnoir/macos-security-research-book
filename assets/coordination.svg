@@ -1,0 +1,79 @@
+<svg viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg" font-family="'Georgia', 'Times New Roman', serif">
+  <defs>
+    <filter id="sh" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="1" dy="1" stdDeviation="2" flood-color="#00000018"/>
+    </filter>
+    <marker id="arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#2c3e50" opacity="0.8"/>
+    </marker>
+    <marker id="arrGreen" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#27ae60"/>
+    </marker>
+    <marker id="arrPurple" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#8e44ad"/>
+    </marker>
+    <marker id="arrOrange" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#e67e22"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="640" height="300" fill="#ffffff"/>
+
+  <!-- Title -->
+  <text x="320" y="28" text-anchor="middle" font-size="13" font-weight="bold" fill="#1a2a3a" letter-spacing="2">RESPONSIBLE DISCLOSURE TIMELINE</text>
+  <line x1="60" y1="36" x2="580" y2="36" stroke="#1a2a3a" stroke-width="0.8" opacity="0.25"/>
+
+  <!-- ── RESEARCHER ENTITY (left) ── -->
+  <rect x="28" y="60" width="90" height="44" rx="5" fill="#1a2a3a" filter="url(#sh)"/>
+  <text x="73" y="79" text-anchor="middle" font-size="11" fill="#ecf0f1" font-weight="bold">RESEARCHER</text>
+  <text x="73" y="96" text-anchor="middle" font-size="9" fill="#95a5a6">you</text>
+
+  <!-- ── VENDOR ENTITY (right) ── -->
+  <rect x="522" y="60" width="90" height="44" rx="5" fill="#2c3e50" filter="url(#sh)"/>
+  <text x="567" y="79" text-anchor="middle" font-size="11" fill="#ecf0f1" font-weight="bold">VENDOR</text>
+  <text x="567" y="96" text-anchor="middle" font-size="9" fill="#95a5a6">security team</text>
+
+  <!-- ── TIMELINE AXIS ── -->
+  <line x1="73" y1="220" x2="567" y2="220" stroke="#bdc3c7" stroke-width="1.5"/>
+  <!-- tick marks -->
+  <line x1="73" y1="215" x2="73" y2="228" stroke="#7f8c8d" stroke-width="1.5"/>
+  <line x1="320" y1="215" x2="320" y2="228" stroke="#7f8c8d" stroke-width="1.5"/>
+  <line x1="567" y1="215" x2="567" y2="228" stroke="#7f8c8d" stroke-width="1.5"/>
+  <!-- Day labels -->
+  <text x="73" y="244" text-anchor="middle" font-size="10" fill="#2c3e50" font-weight="bold">Day 1</text>
+  <text x="73" y="258" text-anchor="middle" font-size="9" fill="#7f8c8d" font-style="italic">Discovery</text>
+  <text x="320" y="244" text-anchor="middle" font-size="10" fill="#2c3e50" font-weight="bold">Day 45</text>
+  <text x="320" y="258" text-anchor="middle" font-size="9" fill="#7f8c8d" font-style="italic">Patch Target</text>
+  <text x="567" y="244" text-anchor="middle" font-size="10" fill="#2c3e50" font-weight="bold">Day 90</text>
+  <text x="567" y="258" text-anchor="middle" font-size="9" fill="#7f8c8d" font-style="italic">Public Disclosure</text>
+
+  <!-- Midpoint marker -->
+  <circle cx="320" cy="220" r="4" fill="#e67e22"/>
+  <circle cx="73" cy="220" r="4" fill="#1a2a3a"/>
+  <circle cx="567" cy="220" r="4" fill="#8e44ad"/>
+
+  <!-- ── ARROW 1: Finding Report (Day 1 → Vendor) ── -->
+  <path d="M 125 82 L 515 82" fill="none" stroke="#2c3e50" stroke-width="1.8" marker-end="url(#arr)"/>
+  <!-- Label above -->
+  <rect x="225" y="66" width="160" height="22" rx="3" fill="#f0f3f7"/>
+  <text x="305" y="81" text-anchor="middle" font-size="10" fill="#2c3e50" font-weight="bold">Initial Finding Report</text>
+
+  <!-- ── ARROW 2: Acknowledgment (Vendor → Researcher) ── -->
+  <path d="M 515 98 L 125 116" fill="none" stroke="#e67e22" stroke-width="1.4" stroke-dasharray="5,3" marker-end="url(#arrOrange)"/>
+  <rect x="225" y="102" width="160" height="20" rx="3" fill="#fef9f0"/>
+  <text x="305" y="115" text-anchor="middle" font-size="10" fill="#e67e22" font-weight="bold">Acknowledgment</text>
+
+  <!-- ── ARROW 3: Patch Released (Vendor → Public, ~Day 45) ── -->
+  <path d="M 515 128 L 140 148" fill="none" stroke="#27ae60" stroke-width="1.8" marker-end="url(#arrGreen)"/>
+  <rect x="225" y="132" width="150" height="20" rx="3" fill="#f0faf4"/>
+  <text x="300" y="145" text-anchor="middle" font-size="10" fill="#27ae60" font-weight="bold">Patch Released</text>
+
+  <!-- ── ARROW 4: Public Disclosure (Day 90) ── -->
+  <path d="M 125 162 L 515 170" fill="none" stroke="#8e44ad" stroke-width="1.8" marker-end="url(#arrPurple)"/>
+  <rect x="225" y="155" width="160" height="20" rx="3" fill="#f8f0fb"/>
+  <text x="305" y="168" text-anchor="middle" font-size="10" fill="#8e44ad" font-weight="bold">Public Disclosure</text>
+
+  <!-- Footer -->
+  <text x="320" y="285" text-anchor="middle" font-size="9" fill="#95a5a6" font-style="italic">90-day standard — aligned with industry practice (Google Project Zero, CERT/CC)</text>
+</svg>
